@@ -29,23 +29,33 @@ Additionally, the project explores advanced cases, such as the effects of magnet
 TDSE_Project/ 
 |
 │── methods/ # Folder for different numerical methods
+|
 │ │── split_operator.py # Split-Operator Method Implementation
+|
 │ │── crank_nicholson.py # Crank-Nicholson Method Implementation
 |
 │── examples/ # Folder for applications on different potentials
+|
 │ │── double_well.py # Double-Well Potential Example
+|
 │ │── harmonic_well.py # Harmonic Potential Example
+|
 │ │── step_potential.py # Step Potential Example
 │
 |── advanced_cases/ # Folder for more complex scenarios
+|
 │ │── magnetic.py # Interaction with Magnetic  Fields
+|
 | |── electric.py # Interaction with electric  Fields
+|
 │ │── time_dependent.py # Time-Dependent Field Effect
+|
 |
 │── README.md # Project documentation
 
 ## Requirements
 The required Python libraries are s follows:
+
 numpy  
 scipy  
 matplotlib  
@@ -54,19 +64,27 @@ seaborn
 ## Instructions for running the code
 
 ## Running Individual Methods:
+
 python methods/split_operator.py
+
 python methods/crank_nicholson.py
 
 
 ## Running Specific Potential Examples
+
 python examples/double_well.py
+
 python examples/harmonic_well.py
+
 python examples/step_potential.py
 
 
 ## Running Advanced Cases
+
 python advanced_cases/magnetic.py
+
 python advanced_cases/electric.py
+
 python advanced_cases/time_dependent.py
 
 
