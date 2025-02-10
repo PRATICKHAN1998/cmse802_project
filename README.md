@@ -8,7 +8,7 @@ This project implements numerical solutions to the Time-Dependent Schrödinger E
 - Split-Operator Method
 - Crank-Nicholson Method
 
-These methods are applied to study **quantum tunneling dynamics** in various potentials:
+These methods are applied to study quantum tunneling dynamics in various potentials:
 - Double-Well Potential (with varying depth and width)
 - Harmonic Potential Well
 - Step Potential Well
@@ -26,31 +26,17 @@ Additionally, the project explores advanced cases, such as the effects of magnet
 ---
 
 ## Folder Structure
-TDSE_Project/ 
-|
-│── methods/ # Folder for different numerical methods
-|
+TDSE_Project/ │── methods/ # Folder for different numerical methods
 │ │── split_operator.py # Split-Operator Method Implementation
-|
 │ │── crank_nicholson.py # Crank-Nicholson Method Implementation
-|
 │── examples/ # Folder for applications on different potentials
-|
 │ │── double_well.py # Double-Well Potential Example
-|
 │ │── harmonic_well.py # Harmonic Potential Example
-|
 │ │── step_potential.py # Step Potential Example
-│
-|── advanced_cases/ # Folder for more complex scenarios
-|
-│ │── magnetic.py # Interaction with Magnetic  Fields
-|
-| |── electric.py # Interaction with electric  Fields
-|
+│── advanced_cases/ # Folder for more complex scenarios
+│ │── magnetic.py # Interaction with Magnetic Fields
+│ │── electric.py # Interaction with Electric Fields
 │ │── time_dependent.py # Time-Dependent Field Effect
-|
-|
 │── README.md # Project documentation
 
 ## Requirements
