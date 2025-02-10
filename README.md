@@ -26,18 +26,31 @@ Additionally, the project explores advanced cases, such as the effects of magnet
 ---
 
 ## Folder Structure
-TDSE_Project/ │── methods/ # Folder for different numerical methods
-│ │── split_operator.py # Split-Operator Method Implementation
-│ │── crank_nicholson.py # Crank-Nicholson Method Implementation
-│── examples/ # Folder for applications on different potentials
-│ │── double_well.py # Double-Well Potential Example
-│ │── harmonic_well.py # Harmonic Potential Example
-│ │── step_potential.py # Step Potential Example
-│── advanced_cases/ # Folder for more complex scenarios
-│ │── magnetic.py # Interaction with Magnetic Fields
-│ │── electric.py # Interaction with Electric Fields
-│ │── time_dependent.py # Time-Dependent Field Effect
-│── README.md # Project documentation
+cmse802_project
+ 
+1.  methods  # Folder for different numerical methods
+
+    1a. split_operator.py # Split-Operator Method Implementation
+
+    1b. crank_nicholson.py # Crank-Nicholson Method Implementation
+
+2.  examples/ # Folder for applications on different potentials
+
+    2a. double_well.py # Double-Well Potential Example
+
+    2b. harmonic_well.py # Harmonic Potential Example
+    
+    2c. step_potential.py # Step Potential Example
+
+3.  advanced_cases/ # Folder for more complex scenarios
+
+    3a. magnetic.py # Interaction with Magnetic Fields
+
+    3b. electric.py # Interaction with Electric Fields
+
+    3c. time_dependent.py # Time-Dependent Field Effect
+
+4.  README.md # Project documentation
 
 ## Requirements
 The required Python libraries are s follows:
