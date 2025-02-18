@@ -4,7 +4,7 @@ This is the main repository for the CMSE-802 final project
 Comparative Analysis of Numerical Methods for Solving the Time-Dependent Schrödinger Equation in Quantum Tunneling Dynamics
 
 ## Project Description
-This project implements numerical solutions to the Time-Dependent Schrödinger Equation (TDSE) using three different methods:
+This project implements numerical solutions to the Time-Dependent Schrödinger Equation (TDSE) using two different methods:
 - Split-Operator Method
 - Crank-Nicholson Method
 
