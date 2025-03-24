@@ -1,9 +1,15 @@
 """
-Module for solving the Crank-Nicolson method in one dimensional for 
-double well potential 
-Author: Agnibha Hanra
+Module for solving the Crank-Nicolson method in one dimension for a double-well potential.
+
+This script simulates the time evolution of a Gaussian wave packet 
+inside a double-well potential using the Crank-Nicolson method. 
+The potential consists of two wells separated by a barrier, allowing 
+for quantum tunneling between them.
+
+Author: Agnibha Hanra  
 Date: March 2025
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation, FFMpegWriter
@@ -17,11 +23,11 @@ N = 500   # Number of spatial points
 dx = L / (N - 1)  # Spatial step
 x = np.linspace(-L/2, L/2, N)  # Centered around 0
 dt = 0.001 # Time step
-T_total = 2.0    # Total time for simulation
-steps = int(T_total / dt)  # Number of time steps
+T_total = 2.0   
+steps = int(T_total / dt) 
 
 # Double Well Potential Parameters
-V0 = 4000.0  # Significantly increased depth of the wells and height of the barrier
+V0 = 4000.0  
 a = 1.3     # Width and separation of the wells
 V = V0 * (x**4 / a**4 - x**2 / a**2)  # Double well potential
 
@@ -74,12 +80,11 @@ def animate(i):
 
 # Creating and saving animation
 output_dir = os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")), "results", "1D_results")
-os.makedirs(output_dir, exist_ok=True)  # Ensure the 1D_results directory exists
+os.makedirs(output_dir, exist_ok=True)  
 
-output_file = os.path.join(output_dir, "1D-double-well-potential.mp4")  # Save path
-ani = FuncAnimation(fig, animate, frames=steps, interval=50, blit=True)  # Increased interval for slower animation
-writer = FFMpegWriter(fps=15, bitrate=1800)  # Reduced fps for slower animation
+output_file = os.path.join(output_dir, "1D-double-well-potential.mp4")  
+ani = FuncAnimation(fig, animate, frames=steps, interval=50, blit=True)  
+writer = FFMpegWriter(fps=15, bitrate=1800)  
 ani.save(output_file, writer=writer)
 
-#plt.show()
 

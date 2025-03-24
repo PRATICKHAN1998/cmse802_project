@@ -1,7 +1,11 @@
 """
-Module for solving the Crank-Nicolson method in one dimensional for 
-harmonic potential well 
-Author: Agnibha Hanra
+Module for solving the Crank-Nicolson method in one dimension for 
+an infinite square potential well.
+ 
+This script simulates the time evolution of a Gaussian wave packet 
+inside an harmonic potential well using the Crank-Nicolson method.
+
+Author: Agnibha Hanra                      
 Date: March 2025
 """
 import numpy as np
@@ -12,13 +16,13 @@ import os
 # Constants
 hbar = 1.0  # Reduced Planck's constant
 m = 1.0    # Mass of the particle
-L = 2.0    # Length of the spatial grid (larger to accommodate harmonic potential)
+L = 2.0    # Length of the spatial grid 
 N = 500   # Number of spatial points
 dx = L / (N - 1)  # Spatial step
 x = np.linspace(-L/2, L/2, N)  # Centered around x=0 for harmonic potential
 dt = 0.001 # Time step
-T = 1.0    # Total time for simulation
-steps = int(T / dt)  # Number of time steps
+T = 1.0    
+steps = int(T / dt)  
 
 # Harmonic potential parameters
 omega = 10.0  # Angular frequency
@@ -40,6 +44,15 @@ B = np.diag((1 - 2 * alpha) * np.ones(N) - 1j * dt / (2 * hbar) * V) + np.diag(a
 
 # Time Evolution
 def time_step(psi):
+    """
+    Perform a single time step of the Crank-Nicholson method.
+  
+    Parameters:
+        psi (ndarray): Current wavefunction.
+
+    Returns:
+        ndarray: Updated wavefunction after one time step.
+    """
     b = B @ psi
     psi_new = np.linalg.solve(A, b)
     return psi_new
@@ -57,6 +70,15 @@ ax.legend()
 
 # Animation Function
 def animate(i):
+    """
+    Update function for animation.
+    
+    Parameters:
+        i (int): Frame index.
+
+    Returns:
+        tuple: Updated plot elements.
+    """
     global psi
     psi = time_step(psi)
     line.set_data(x, np.abs(psi) ** 2)
@@ -66,12 +88,11 @@ def animate(i):
 output_dir = os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")), "results", "1D_results")
 os.makedirs(output_dir, exist_ok=True)  
 
-output_file = os.path.join(output_dir, "1D-harmonic-potential.mp4")  # Save path
+output_file = os.path.join(output_dir, "1D-harmonic-potential.mp4")  # Saving path
 ani = FuncAnimation(fig, animate, frames=steps, interval=20, blit=True)
 
-# Save Animation using FFMpeg
+# Saving Animation using FFMpeg
 writer = FFMpegWriter(fps=30, bitrate=1800)
 ani.save(output_file, writer=writer)
 
-#plt.show()
 
