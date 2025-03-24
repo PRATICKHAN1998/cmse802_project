@@ -28,21 +28,16 @@ Additionally, the project explores advanced cases, such as the effects of magnet
 ## Folder Structure
 cmse802_project
  
-1.  methods  # Folder for different numerical methods
+1.  methods  # Folder for different numerical methods and different potential wells
 
-    1a. split_operator.py # Split-Operator Method Implementation
+    1a. crank_nicolson_harmonic_well_1D.py.py # Crank-Nicolson Method for harmonic potential well
 
-    1b. crank_nicholson.py # Crank-Nicholson Method Implementation
+    1b. crank_nicolson_step_well_1D.py # Crank-Nicolson Method for step potential well
 
-2.  examples/ # Folder for applications on different potentials
+    1c. crank_nicolson_double_well_1D.py # Crank-Nicolson Method for double well
 
-    2a. double_well.py # Double-Well Potential Example
 
-    2b. harmonic_well.py # Harmonic Potential Example
-    
-    2c. step_potential.py # Step Potential Example
-
-3.  advanced_cases/ # Folder for more complex scenarios
+2.  advanced_cases/ # Folder for more complex scenarios
 
     3a. magnetic.py # Interaction with Magnetic Fields
 
@@ -64,26 +59,18 @@ seaborn
 
 ## Running Individual Methods:
 
-python methods/split_operator.py
+python src/methods/crank_nicolson_double_well_1D.py
 
-python methods/crank_nicholson.py
+python src/methods/crank_nicolson_harmonic_well_1D.py
 
-
-## Running Specific Potential Examples
-
-python examples/double_well.py
-
-python examples/harmonic_well.py
-
-python examples/step_potential.py
-
+python src/methods/crank_nicolson_step_well_1D.py
 
 ## Running Advanced Cases
 
-python advanced_cases/magnetic.py
+python src/dvanced_cases/magnetic.py
 
-python advanced_cases/electric.py
+python src/advanced_cases/electric.py
 
-python advanced_cases/time_dependent.py
+python src/advanced_cases/time_dependent.py
 
 

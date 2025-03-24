@@ -1,0 +1,1 @@
+This unti testing implements the inifnite-square potential well as a test case just to check whether the implementaton for both the methods are right or not. So it will create the animations for this test case.
