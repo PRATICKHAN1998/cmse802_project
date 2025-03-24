@@ -29,12 +29,14 @@ Additionally, the project explores advanced cases, such as the effects of magnet
 cmse802_project
  
 1.  methods  # Folder for different numerical methods and different potential wells
+    
+    1a.crank_nicolson_square_well_1D.py.py # Crank-Nicolson Method for infinite square potential well 
 
-    1a. crank_nicolson_harmonic_well_1D.py.py # Crank-Nicolson Method for harmonic potential well
+    1b. crank_nicolson_harmonic_well_1D.py.py # Crank-Nicolson Method for harmonic potential well
 
-    1b. crank_nicolson_step_well_1D.py # Crank-Nicolson Method for step potential well
+    1c. crank_nicolson_step_well_1D.py # Crank-Nicolson Method for step potential well
 
-    1c. crank_nicolson_double_well_1D.py # Crank-Nicolson Method for double well
+    1d. crank_nicolson_double_well_1D.py # Crank-Nicolson Method for double well
 
 
 2.  advanced_cases/ # Folder for more complex scenarios
@@ -58,6 +60,8 @@ seaborn
 ## Instructions for running the code
 
 ## Running Individual Methods:
+
+python src/methods/crank_nicolson_square_well_1D.py
 
 python src/methods/crank_nicolson_double_well_1D.py
 
