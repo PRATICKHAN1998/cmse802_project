@@ -61,8 +61,8 @@ fig, ax = plt.subplots()
 ax.set_xlim(0, L)
 ax.set_ylim(-2, 100)
 lines = [ax.plot([], [], lw=2, color=color, label=f"$V_0 = {V0}$")[0] for V0, color in zip(V0_values, colors)]
-step_line = ax.axvline(x=a, color='black', linestyle='--', linewidth=3, label="Step Position $x = a$")  # Thicker step line
-transmission_text = ax.text(0.02, 0.95, "", transform=ax.transAxes, fontsize=10, verticalalignment='top')  # Text for transmission coefficients
+step_line = ax.axvline(x=a, color='black', linestyle='--', linewidth=3, label="Step Position $x = a$")  
+transmission_text = ax.text(0.02, 0.95, "", transform=ax.transAxes, fontsize=10, verticalalignment='top')  
 ax.set_title("Wave Packet Dynamics for Different Step Heights $V_0$")
 ax.set_xlabel("Position $x$")
 ax.set_ylabel("Probability Density $|\psi|^2$")
@@ -78,16 +78,16 @@ def animate(i):
         lines[j].set_data(x, np.abs(psi_all[j]) ** 2)
         T = calculate_transmission_coefficient(psi_all[j])
         transmission_coefficients.append(f"$V_0 = {V0_values[j]}$: $T = {T:.3f}$")
-    transmission_text.set_text("\n".join(transmission_coefficients))  # Update transmission coefficients
+    transmission_text.set_text("\n".join(transmission_coefficients))  # Updating transmission coefficients
     return lines + [step_line, transmission_text]
 
 # Creating and saving animation
 output_dir = os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")), "results", "1D_results")
-os.makedirs(output_dir, exist_ok=True)  # Ensure the 1D_results directory exists
+os.makedirs(output_dir, exist_ok=True)  
 
 output_file = os.path.join(output_dir, "1D-step-potential.mp4")  # Save path
 ani = FuncAnimation(fig, animate, frames=steps, interval=50, blit=True)  # Increased interval for slower animation
-writer = FFMpegWriter(fps=15, bitrate=1800)  # Reduced fps for slower animation
+writer = FFMpegWriter(fps=15, bitrate=1800)  
 ani.save(output_file, writer=writer)
 
 #plt.show()

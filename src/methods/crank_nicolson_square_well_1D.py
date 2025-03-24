@@ -60,7 +60,7 @@ def animate(i):
 
 # Creatnge and saving animation
 output_dir = os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")), "results", "1D_results")
-os.makedirs(output_dir, exist_ok=True)  # Ensure the 1D_results directory exists
+os.makedirs(output_dir, exist_ok=True)  
 
 output_file = os.path.join(output_dir, "1D-infinite-square-potential.mp4")  # Save path
 ani = FuncAnimation(fig, animate, frames=steps, interval=50, blit=True)  # Increased interval for slower animation
