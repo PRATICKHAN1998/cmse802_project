@@ -59,10 +59,14 @@ cmse802_project
 The required Python libraries are s follows:
 
 numpy  
+
 scipy  
+
 matplotlib  
+
 seaborn
-ffmpeg 
+
+ffmpeg(conda install conda-forge::ffmpeg) 
 
 ## Instructions for running the code
 
