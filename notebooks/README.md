@@ -1,1 +1,0 @@
-These notebooks are for the analysis purpose, especilaly calling the main modules only to save the animations and potetial well plots in the results directory. Still working on it. Getting errors while solving the whole thing in jupyter notebook. Will fix it soon.

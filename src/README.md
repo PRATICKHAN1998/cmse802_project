@@ -1,1 +1,1 @@
-This directory contains the main programs for solving TSDE via Crank-Nicolson and split-operator method for various potential wells.It also includes the source codes for the advanced cases.
+This directory contains the main programs for solving TSDE via Crank-Nicolson and split-operator method for various potential wells. There are also jupyter notebooks in src directory that are used to resolve linting and formatting issues and also for visualization purposes.
