@@ -2,7 +2,17 @@
 1D and 2D simulation of quantum wave packet dynamics across potential steps
 using the Split-Operator Method with Fast Fourier Transforms.
 
-Author: Agnibha Hanra
+Features
+--------
+- Simulates quantum wave packet evolution across potential steps
+- Uses Split-Operator Method with FFT for efficient time evolution
+- Handles both 1D and 2D cases with proper normalization
+- Visualizations include:
+    * 1D: Probability density evolution with step position marked
+    * 2D: Heatmap and 3D surface plots of probability density
+- Saves animations as MP4 files in organized directory structure
+
+Author: Agnibha Hanra  
 Date: March 2025
 """
 
@@ -13,87 +23,210 @@ from mpl_toolkits.mplot3d import Axes3D
 import os
 
 # Physical constants
-hbar = 1.0  # Reduced Planck's constant
-m = 1.0  # Mass of the particle
-L = 1.0  # Length of the spatial domain
+hbar = 1.0  # Reduced Planck's constant (natural units)
+m = 1.0     # Particle mass (natural units)
+L = 1.0     # Length of the spatial domain
 
 
 def initialize_1d_system(N=500, dt=0.001, T_total=0.1):
-    """Initialize 1D system parameters"""
+    """
+    Initialize the 1D system with potential step for simulation.
+    
+    Parameters
+    ----------
+    N : int
+        Number of spatial grid points
+    dt : float
+        Time step size
+    T_total : float
+        Total simulation time
+        
+    Returns
+    -------
+    x : ndarray
+        1D spatial grid (0 to L)
+    k : ndarray
+        Wave vector grid for FFT
+    psi : ndarray
+        Initial wave function (Gaussian wave packet)
+    V : ndarray
+        Potential energy profile (step potential)
+    dt : float
+        Time step (same as input)
+    steps : int
+        Number of time steps
+    a : float
+        Position of potential step
+    V0 : float
+        Height of potential step
+    """
     dx = L / (N - 1)
     x = np.linspace(0, L, N)
     steps = int(T_total / dt)
 
-    # Wave vector for FFT
+    # Wave vector for FFT (momentum space representation)
     k = 2 * np.pi * np.fft.fftfreq(N, d=dx)
 
     # Initial Gaussian wave packet
-    x0 = L / 4
-    sigma = 0.05
-    k0 = 5.0
+    x0 = L / 4  # Initial position (left of step)
+    sigma = 0.05  # Width of wave packet
+    k0 = 5.0  # Initial momentum
     psi = np.exp(-((x - x0) ** 2) / (2 * sigma**2)) * np.exp(1j * k0 * x)
-    psi /= np.sqrt(np.sum(np.abs(psi) ** 2) * dx)  # Normalize
+    psi /= np.sqrt(np.sum(np.abs(psi) ** 2) * dx)  # Normalization
 
-    # Potential Step
-    a = L / 2
-    V0 = 20
+    # Potential Step configuration
+    a = L / 2  # Step position
+    V0 = 20    # Step height
     V = np.zeros(N)
-    V[x >= a] = V0
+    V[x >= a] = V0  # Create step at x = a
 
     return x, k, psi, V, dt, steps, a, V0
 
 
 def initialize_2d_system(N=500, dt=0.001, T_total=0.5):
-    """Initialize 2D system parameters"""
+    """
+    Initialize the 2D system with potential step for simulation.
+    
+    Parameters
+    ----------
+    N : int
+        Number of grid points per dimension
+    dt : float
+        Time step size
+    T_total : float
+        Total simulation time
+        
+    Returns
+    -------
+    X : ndarray
+        2D X-coordinate grid
+    Y : ndarray
+        2D Y-coordinate grid
+    Kx : ndarray
+        X-component wave vector grid for FFT
+    Ky : ndarray
+        Y-component wave vector grid for FFT
+    psi : ndarray
+        Initial 2D wave function
+    V : ndarray
+        2D potential energy landscape (step potential)
+    dt : float
+        Time step
+    steps : int
+        Number of time steps
+    a : float
+        Position of potential step
+    V0 : float
+        Height of potential step
+    """
     dx = L / (N - 1)
     x = y = np.linspace(0, L, N)
     X, Y = np.meshgrid(x, y)
     steps = int(T_total / dt)
 
-    # Wave vectors
+    # Wave vectors for 2D FFT
     kx = ky = 2 * np.pi * np.fft.fftfreq(N, d=dx)
     Kx, Ky = np.meshgrid(kx, ky)
 
     # Initial 2D Gaussian wave packet
-    x0 = y0 = L / 4
-    sigma_x = sigma_y = 0.05
-    k0x, k0y = 5.0, 0.0
+    x0 = y0 = L / 4  # Initial position (left of step)
+    sigma_x = sigma_y = 0.05  # Widths
+    k0x, k0y = 5.0, 0.0  # Initial momentum (x-direction only)
     psi = np.exp(
         -((X - x0) ** 2) / (2 * sigma_x**2) - (Y - y0) ** 2 / (2 * sigma_y**2)
     ) * np.exp(1j * (k0x * X + k0y * Y))
-    psi /= np.sqrt(np.sum(np.abs(psi) ** 2) * dx**2)
+    psi /= np.sqrt(np.sum(np.abs(psi) ** 2) * dx**2)  # Normalization
 
-    # Potential Step
-    a = L / 2
-    V0 = 20
+    # 2D Potential Step configuration
+    a = L / 2  # Step position
+    V0 = 20    # Step height
     V = np.zeros((N, N))
-    V[X >= a] = V0
+    V[X >= a] = V0  # Create step at x = a
 
     return X, Y, Kx, Ky, psi, V, dt, steps, a, V0
 
 
 def time_step_1d(psi, V, k, dt):
-    """Perform one time step in 1D"""
+    """
+    Perform a single time step in 1D using Split-Operator Method.
+    
+    Parameters
+    ----------
+    psi : ndarray
+        Current wave function
+    V : ndarray
+        Potential energy profile
+    k : ndarray
+        Wave vector grid
+    dt : float
+        Time step size
+        
+    Returns
+    -------
+    psi : ndarray
+        Updated wave function after one time step
+    """
+    # Split-Operator steps:
+    # 1. Half-step in position space
     psi = np.exp(-0.5j * V * dt / hbar) * psi
+    
+    # 2. Full-step in momentum space
     psi_k = np.fft.fft(psi)
     psi_k *= np.exp(-0.5j * hbar * k**2 * dt / m)
     psi = np.fft.ifft(psi_k)
+    
+    # 3. Another half-step in position space
     psi = np.exp(-0.5j * V * dt / hbar) * psi
+    
     return psi
 
 
 def time_step_2d(psi, V, Kx, Ky, dt):
-    """Perform one time step in 2D"""
+    """
+    Perform a single time step in 2D using Split-Operator Method.
+    
+    Parameters
+    ----------
+    psi : ndarray
+        Current 2D wave function
+    V : ndarray
+        2D potential energy landscape
+    Kx : ndarray
+        X-component wave vector grid
+    Ky : ndarray
+        Y-component wave vector grid
+    dt : float
+        Time step size
+        
+    Returns
+    -------
+    psi : ndarray
+        Updated wave function after one time step
+    """
+    # Split-Operator steps:
+    # 1. Half-step in position space
     psi = np.exp(-0.5j * V * dt / hbar) * psi
+    
+    # 2. Full-step in momentum space
     psi_k = np.fft.fft2(psi)
     psi_k *= np.exp(-0.5j * hbar * (Kx**2 + Ky**2) * dt / m)
     psi = np.fft.ifft2(psi_k)
+    
+    # 3. Another half-step in position space
     psi = np.exp(-0.5j * V * dt / hbar) * psi
+    
     return psi
 
 
 def run_1d_step_potential_simulation():
-    """Run and visualize 1D simulation"""
+    """
+    Run and animate the 1D step potential simulation.
+    
+    Produces:
+    - Plot of probability density evolving in time
+    - Vertical line marking step position
+    - Saves animation as MP4 in results/split_operator_1D_results/
+    """
     x, k, psi, V, dt, steps, a, V0 = initialize_1d_system()
 
     # Setup plot
@@ -129,7 +262,14 @@ def run_1d_step_potential_simulation():
 
 
 def run_2d_step_potential_simulation():
-    """Run and visualize 2D simulation with 2D and 3D probability density plots"""
+    """
+    Run and animate the 2D step potential simulation.
+    
+    Produces:
+    - 2D heatmap of probability density with step position marked
+    - 3D surface plot of probability density
+    - Saves animation as MP4 in results/split_operator_2D_results/
+    """
     X, Y, Kx, Ky, psi, V, dt, steps, a, V0 = initialize_2d_system()
 
     # Setup combined figure
@@ -142,7 +282,7 @@ def run_2d_step_potential_simulation():
     )
     ax1.axvline(x=a, color="red", linestyle="--", linewidth=2)
     plt.colorbar(im, ax=ax1, label="Probability Density")
-    ax1.set_title("2D Probability Density")
+    ax1.set_title("2D Probability Density $|\psi(x,y,t)|^2$")
     ax1.set_xlabel("X Position")
     ax1.set_ylabel("Y Position")
 

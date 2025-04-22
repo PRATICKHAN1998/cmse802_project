@@ -2,7 +2,16 @@
 1D and 2D simulation of time evolution in step potential wells
 using the Crank-Nicolson method.
 
-Author: Agnibha Hanra
+Features
+--------
+- Initializes Gaussian wave packets in 1D/2D step potentials
+- Evolves wavefunctions using Crank-Nicolson with potential terms
+- Visualizes:
+    * 1D: Probability density with step position marked
+    * 2D: Heatmap and 3D surface plots with potential boundary
+- Saves animations as MP4 files in results directory
+
+Author: Agnibha Hanra  
 Date: March 2025
 """
 
@@ -13,12 +22,45 @@ from mpl_toolkits.mplot3d import Axes3D
 import os
 
 # Constants
-hbar = 1.0
-m = 1.0
-L = 1.0
+hbar = 1.0  # Reduced Planck's constant
+m = 1.0     # Particle mass
+L = 1.0     # System length
 
 
-def initialize_1d_step_potential(N=50, dt=0.001, T_total=0.5, V0=20):
+def initialize_1d_step_potential(N=500, dt=0.001, T_total=0.5, V0=20):
+    """
+    Initialize the 1D system with a step potential for Crank-Nicolson simulation.
+    
+    Parameters
+    ----------
+    N : int
+        Number of spatial grid points
+    dt : float
+        Time step size
+    T_total : float
+        Total simulation time
+    V0 : float
+        Height of the potential step
+        
+    Returns
+    -------
+    x : ndarray
+        1D spatial grid
+    psi : ndarray
+        Initial wave function
+    A : ndarray
+        Left-hand side matrix for Crank-Nicolson
+    B : ndarray
+        Right-hand side matrix for Crank-Nicolson
+    dt : float
+        Time step
+    steps : int
+        Number of time steps
+    a : float
+        Step position
+    V0 : float
+        Potential step height
+    """
     dx = L / (N - 1)
     x = np.linspace(0, L, N)
     steps = int(T_total / dt)
@@ -33,7 +75,6 @@ def initialize_1d_step_potential(N=50, dt=0.001, T_total=0.5, V0=20):
     psi = np.exp(-((x - x0) ** 2) / (2 * sigma**2)) * np.exp(1j * k0 * x)
     psi /= np.sqrt(np.sum(np.abs(psi) ** 2) * dx)  # Normalize
 
-    # Crank-Nicolson Coefficients and Matrices
     alpha = 1j * hbar * dt / (2 * m * dx**2)
     diag = 1 + 2 * alpha + 1j * dt * V / (2 * hbar)
     off_diag = -alpha * np.ones(N - 1)
@@ -48,13 +89,67 @@ def initialize_1d_step_potential(N=50, dt=0.001, T_total=0.5, V0=20):
 
 
 def time_step_crank_nicolson_1d_step(psi, A, B):
+    """
+    Perform a single Crank-Nicolson time step in 1D with step potential.
+    
+    Parameters
+    ----------
+    psi : ndarray
+        Current wave function
+    A : ndarray
+        Left-hand side matrix
+    B : ndarray
+        Right-hand side matrix
+        
+    Returns
+    -------
+    psi_new : ndarray
+        Updated wave function after one time step
+    """
     b = B @ psi
     psi_new = np.linalg.solve(A, b)
-    psi_new[0] = psi_new[-1] = 0
+    psi_new[0] = psi_new[-1] = 0  # Boundary conditions
     return psi_new
 
 
-def initialize_2d_step_potential(N=50, dt=0.001, T_total=0.5, V0=20):
+def initialize_2d_step_potential(N=500, dt=0.001, T_total=0.5, V0=20):
+    """
+    Initialize the 2D system with a step potential for Crank-Nicolson simulation.
+    
+    Parameters
+    ----------
+    N : int
+        Number of grid points per dimension
+    dt : float
+        Time step size
+    T_total : float
+        Total simulation time
+    V0 : float
+        Height of the potential step
+        
+    Returns
+    -------
+    X : ndarray
+        2D X-coordinate grid
+    Y : ndarray
+        2D Y-coordinate grid  
+    psi : ndarray
+        Initial 2D wave function
+    V : ndarray
+        Potential energy landscape
+    D : ndarray
+        Crank-Nicolson operator matrix
+    D_inv : ndarray
+        Inverse of Crank-Nicolson operator
+    dt : float
+        Time step
+    steps : int
+        Number of time steps
+    a : float
+        Step position
+    V0 : float
+        Potential step height
+    """
     dx = L / (N - 1)
     x = y = np.linspace(0, L, N)
     X, Y = np.meshgrid(x, y)
@@ -72,7 +167,6 @@ def initialize_2d_step_potential(N=50, dt=0.001, T_total=0.5, V0=20):
     ) * np.exp(1j * (k0x * X + k0y * Y))
     psi /= np.sqrt(np.sum(np.abs(psi) ** 2) * dx**2)  # Normalize
 
-    # Crank-Nicolson Coefficients and Matrices
     alpha = 1j * hbar * dt / (4 * m * dx**2)
     D_x = (
         np.diag(np.ones(N) * (1 + 2 * alpha))
@@ -85,16 +179,43 @@ def initialize_2d_step_potential(N=50, dt=0.001, T_total=0.5, V0=20):
 
 
 def time_step_crank_nicolson_2d_step(psi, V, D, D_inv, dt):
-    psi[0, :] = psi[-1, :] = psi[:, 0] = psi[:, -1] = 0
-    psi = np.exp(-0.5j * V * dt / hbar) * psi
-    psi = D_inv @ psi @ D_inv.T
-    psi = np.exp(-0.5j * V * dt / hbar) * psi
-    psi[0, :] = psi[-1, :] = psi[:, 0] = psi[:, -1] = 0
+    """
+    Perform a single Crank-Nicolson time step in 2D with step potential.
+    
+    Parameters
+    ----------
+    psi : ndarray
+        Current 2D wave function
+    V : ndarray
+        Potential energy landscape
+    D : ndarray
+        Crank-Nicolson operator
+    D_inv : ndarray
+        Inverse of Crank-Nicolson operator
+    dt : float
+        Time step size
+        
+    Returns
+    -------
+    psi : ndarray
+        Updated wave function after one time step
+    """
+    psi[0, :] = psi[-1, :] = psi[:, 0] = psi[:, -1] = 0  # Boundary conditions
+    psi = np.exp(-0.5j * V * dt / hbar) * psi  # Potential half-step
+    psi = D_inv @ psi @ D_inv.T  # Kinetic step
+    psi = np.exp(-0.5j * V * dt / hbar) * psi  # Potential half-step
+    psi[0, :] = psi[-1, :] = psi[:, 0] = psi[:, -1] = 0  # Reapply boundaries
     return psi
 
 
 def run_1d_step_potential_simulation():
+    """
+    Run and animate the 1D step potential simulation.
+    
+    Saves animation as MP4 in results/crank_nicolson_1D_results/
+    """
     x, psi, A, B, dt, steps, a, V0 = initialize_1d_step_potential()
+    
     fig, ax = plt.subplots()
     (line,) = ax.plot(x, np.abs(psi) ** 2, color="blue", lw=2)
     ax.axvline(
@@ -103,8 +224,8 @@ def run_1d_step_potential_simulation():
     ax.set_xlim(0, L)
     ax.set_ylim(-2, 30)
     ax.set_xlabel("Position x")
-    ax.set_ylabel("Probability Density $|\psi|^2$")
-    ax.set_title("1D Step Potential Crank-Nicolson Simulation")
+    ax.set_ylabel("Probability Density")
+    ax.set_title("1D Wave Packet Across Potential Step (V₀ = {V0})")
     ax.legend()
 
     def animate(i):
@@ -128,6 +249,14 @@ def run_1d_step_potential_simulation():
 
 
 def run_2d_step_potential_simulation():
+    """
+    Run and animate the 2D step potential simulation.
+    
+    Produces:
+    - 2D heatmap of probability density
+    - 3D surface plot of probability density
+    Saves animation as MP4 in results/crank_nicolson_2D_results/
+    """
     X, Y, psi, V, D, D_inv, dt, steps, a, V0 = initialize_2d_step_potential()
 
     fig = plt.figure(figsize=(14, 6))
@@ -152,22 +281,26 @@ def run_2d_step_potential_simulation():
     ax1.legend()
 
     # Right: 3D surface plot
-    ax2 = fig.add_subplot(1, 2, 2, projection="3d")
-    surf = ax2.plot_surface(X, Y, np.abs(psi) ** 2, cmap="plasma", rstride=2, cstride=2)
+   
+    ax2 = fig.add_subplot(122, projection="3d")
+    surf = ax2.plot_surface(
+    X, Y, np.abs(psi) ** 2, cmap="hot", rstride=2, cstride=2, alpha=0.8 )
     ax2.set_title("3D Probability Density")
-    ax2.set_xlabel("X")
-    ax2.set_ylabel("Y")
-    ax2.set_zlabel("Density")
+    ax2.set_xlabel("X position")
+    ax2.set_ylabel("Y position")
+    ax2.set_zlabel("|ψ|²")
+    ax2.set_zlim(0, np.max(np.abs(psi) ** 2))
+
+    fig.suptitle(f"2D Wave Packet Across Potential Step (V₀ = {V0})", fontsize=14)
+    plt.tight_layout()
 
     def animate(i):
         nonlocal psi, surf
         psi = time_step_crank_nicolson_2d_step(psi, V, D, D_inv, dt)
 
-        # Update 2D heatmap
         im.set_array(np.abs(psi) ** 2)
         im.set_clim(0, np.max(np.abs(psi) ** 2))
 
-        # Update 3D surface plot
         ax2.clear()
         surf = ax2.plot_surface(
             X, Y, np.abs(psi) ** 2, cmap="plasma", rstride=2, cstride=2
