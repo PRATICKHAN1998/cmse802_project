@@ -25,13 +25,13 @@ import os
 
 # Physical constants
 hbar = 1.0  # Reduced Planck's constant (natural units)
-m = 1.0     # Particle mass (natural units)
+m = 1.0  # Particle mass (natural units)
 
 
-def initialize_1d_system(L=4.0, N=500, dt=0.001, T_total=0.5):
+def initialize_1d_system(L=4.0, N=500, dt=0.001, T_total=1.0):
     """
     Initialize the 1D double-well system for simulation.
-    
+
     Parameters
     ----------
     L : float
@@ -42,7 +42,7 @@ def initialize_1d_system(L=4.0, N=500, dt=0.001, T_total=0.5):
         Time step size
     T_total : float
         Total simulation time
-        
+
     Returns
     -------
     x : ndarray
@@ -64,26 +64,27 @@ def initialize_1d_system(L=4.0, N=500, dt=0.001, T_total=0.5):
 
     # Double-well potential parameters
     V0 = 4000.0  # Potential depth parameter
-    a = 0.6      # Controls well separation and width
+    a = 0.1  # Controls well separation and width
     V = V0 * (x**4 / a**4 - x**2 / a**2)
+    V_norm = V / np.max(np.abs(V)) * 10  # Scaled for visualization
 
     # Wave vector for FFT (momentum space representation)
     k = 2 * np.pi * np.fft.fftfreq(N, d=dx)
 
     # Initial Gaussian wave packet (localized in left well)
-    x0 = -1.0    # Initial position (left well)
-    sigma = 0.05 # Width of wave packet
-    k0 = 5.0     # Initial momentum
+    x0 = -1.0  # Initial position (left well)
+    sigma = 0.05  # Width of wave packet
+    k0 = 5.0  # Initial momentum
     psi = np.exp(-((x - x0) ** 2) / (2 * sigma**2)) * np.exp(1j * k0 * x)
     psi /= np.sqrt(np.sum(np.abs(psi) ** 2) * dx)  # Normalization
 
-    return x, k, psi, V, dt, steps
+    return x, k, psi, V_norm, dt, steps
 
 
-def initialize_2d_system(L=4.0, N=500, dt=0.001, T_total=0.5):
+def initialize_2d_system(L=4.0, N=500, dt=0.001, T_total=1.0):
     """
     Initialize the 2D double-well system for simulation.
-    
+
     Parameters
     ----------
     L : float
@@ -94,7 +95,7 @@ def initialize_2d_system(L=4.0, N=500, dt=0.001, T_total=0.5):
         Time step size
     T_total : float
         Total simulation time
-        
+
     Returns
     -------
     X : ndarray
@@ -121,8 +122,8 @@ def initialize_2d_system(L=4.0, N=500, dt=0.001, T_total=0.5):
 
     # 2D Double-well potential parameters
     V0 = 4000.0  # Potential depth parameter
-    a = 0.6      # Controls well separation and width
-    V = V0 * (X**4 / a**4 - X**2 / a**2 + Y**4 / a**4 - Y**2 / a**2)
+    ax =ay= 0.1  # Controls well separation and width
+    V = V0 * (X**4 / ax**4 - X**2 / ax**2 + Y**4 / ay**4 - Y**2 / ay**2)
 
     # Wave vectors for 2D FFT
     kx = ky = 2 * np.pi * np.fft.fftfreq(N, d=dx)
@@ -140,10 +141,10 @@ def initialize_2d_system(L=4.0, N=500, dt=0.001, T_total=0.5):
     return X, Y, Kx, Ky, psi, V, dt, steps
 
 
-def time_step_1d(psi, V, k, dt):
+def time_step_1d(psi, V_norm, k, dt):
     """
     Perform a single time step in 1D using Split-Operator Method.
-    
+
     Parameters
     ----------
     psi : ndarray
@@ -154,7 +155,7 @@ def time_step_1d(psi, V, k, dt):
         Wave vector grid
     dt : float
         Time step size
-        
+
     Returns
     -------
     psi : ndarray
@@ -162,23 +163,23 @@ def time_step_1d(psi, V, k, dt):
     """
     # Split-Operator steps:
     # 1. Half-step in position space
-    psi = np.exp(-0.5j * V * dt / hbar) * psi
-    
+    psi = np.exp(-0.5j * V_norm * dt / hbar) * psi
+
     # 2. Full-step in momentum space
     psi_k = np.fft.fft(psi)
     psi_k *= np.exp(-0.5j * hbar * k**2 * dt / m)
     psi = np.fft.ifft(psi_k)
-    
+
     # 3. Another half-step in position space
-    psi = np.exp(-0.5j * V * dt / hbar) * psi
-    
+    psi = np.exp(-0.5j * V_norm * dt / hbar) * psi
+
     return psi
 
 
 def time_step_2d(psi, V, Kx, Ky, dt):
     """
     Perform a single time step in 2D using Split-Operator Method.
-    
+
     Parameters
     ----------
     psi : ndarray
@@ -191,7 +192,7 @@ def time_step_2d(psi, V, Kx, Ky, dt):
         Y-component wave vector grid
     dt : float
         Time step size
-        
+
     Returns
     -------
     psi : ndarray
@@ -200,44 +201,44 @@ def time_step_2d(psi, V, Kx, Ky, dt):
     # Split-Operator steps:
     # 1. Half-step in position space
     psi = np.exp(-0.5j * V * dt / hbar) * psi
-    
+
     # 2. Full-step in momentum space
     psi_k = np.fft.fft2(psi)
     psi_k *= np.exp(-0.5j * hbar * (Kx**2 + Ky**2) * dt / m)
     psi = np.fft.ifft2(psi_k)
-    
+
     # 3. Another half-step in position space
     psi = np.exp(-0.5j * V * dt / hbar) * psi
-    
+
     return psi
 
 
 def run_1d_double_well_simulation():
     """
     Run and animate the 1D double-well tunneling simulation.
-    
+
     Produces:
     - Plot of probability density evolving in time
     - Overlay of the double-well potential (scaled)
     - Saves animation as MP4 in results/split_operator_1D_results/
     """
-    x, k, psi, V, dt, steps = initialize_1d_system()
+    x, k, psi, V_norm, dt, steps = initialize_1d_system()
 
     # Setup plot
     fig, ax = plt.subplots(figsize=(10, 6))
     (line,) = ax.plot(x, np.abs(psi) ** 2, "b-", lw=2, label="$|\psi|^2$")
-    (pot_line,) = ax.plot(x, V / 400, "k--", label="Potential (scaled)")
+    (pot_line,) = ax.plot(x, V_norm, "k--", label="Potential (scaled)")
     ax.set_xlim(-2, 2)
     ax.set_ylim(-2, 10)
     ax.set_title("1D Quantum Tunneling in Double Well")
     ax.set_xlabel("Position")
-    ax.set_ylabel("Probability Density")
+    ax.set_ylabel("Probability Density / Potential")
     ax.legend()
     ax.grid(True, alpha=0.3)
 
     def animate(i):
         nonlocal psi
-        psi = time_step_1d(psi, V, k, dt)
+        psi = time_step_1d(psi, V_norm, k, dt)
         line.set_ydata(np.abs(psi) ** 2)
         return line, pot_line
 
@@ -259,7 +260,7 @@ def run_1d_double_well_simulation():
 def run_2d_double_well_simulation():
     """
     Run and animate the 2D double-well tunneling simulation.
-    
+
     Produces:
     - 2D heatmap of probability density
     - 3D surface plot of probability density
@@ -292,7 +293,9 @@ def run_2d_double_well_simulation():
         np.abs(psi) ** 2, extent=[-2, 2, -2, 2], origin="lower", cmap="viridis"
     )
     plt.colorbar(im, ax=ax1, label="Probability Density")
-    ax1.set_title("2D Probability Density")
+    ax1.set_title("2D Probability Density $|\psi(x,y,t)|^2$")
+    ax1.set_xlabel("X")
+    ax1.set_ylabel("Y")
 
     # 3D Surface plot
     ax2 = fig.add_subplot(122, projection="3d")
@@ -300,8 +303,11 @@ def run_2d_double_well_simulation():
         X, Y, np.abs(psi) ** 2, cmap="hot", rstride=2, cstride=2, alpha=0.8
     )
     ax2.set_title("3D Probability Density")
+    ax2.set_xlabel("X")
+    ax2.set_ylabel("Y")
+    ax2.set_zlabel("Probability Density")
 
-    fig.suptitle("2D Quantum Tunneling in Double Well", fontsize=14)
+    fig.suptitle("2D Double Well Wave Packet Dynamics", fontsize=14)
     plt.tight_layout()
 
     def animate(i):
@@ -319,7 +325,9 @@ def run_2d_double_well_simulation():
         )
         ax2.set_zlim(0, np.max(np.abs(psi) ** 2))
         ax2.set_title("3D Probability Density")
-
+        ax2.set_xlabel("X")
+        ax2.set_ylabel("Y")
+        ax2.set_zlabel("Probability Density")
         return im, surf
 
     # Save animation

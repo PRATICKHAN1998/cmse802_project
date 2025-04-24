@@ -25,13 +25,13 @@ import os
 
 # Physical constants
 hbar = 1.0  # Reduced Planck's constant (natural units)
-m = 1.0     # Particle mass (natural units)
+m = 1.0  # Particle mass (natural units)
 
 
 def initialize_1d_system(L=1.0, N=500, dt=0.001, T=0.5):
     """
     Initialize the 1D harmonic oscillator system for simulation.
-    
+
     Parameters
     ----------
     L : float
@@ -42,7 +42,7 @@ def initialize_1d_system(L=1.0, N=500, dt=0.001, T=0.5):
         Time step size
     T : float
         Total simulation time
-        
+
     Returns
     -------
     x : ndarray
@@ -70,9 +70,9 @@ def initialize_1d_system(L=1.0, N=500, dt=0.001, T=0.5):
     k = 2 * np.pi * np.fft.fftfreq(N, d=dx)
 
     # Initial Gaussian wave packet (centered at origin)
-    x0 = 0.0     # Initial position
-    sigma = 0.05 # Width of wave packet
-    k0 = 5.0     # Initial momentum
+    x0 = 0.0  # Initial position
+    sigma = 0.05  # Width of wave packet
+    k0 = 5.0  # Initial momentum
     psi = np.exp(-((x - x0) ** 2) / (2 * sigma**2)) * np.exp(1j * k0 * x)
     psi /= np.sqrt(np.sum(np.abs(psi) ** 2) * dx)  # Normalization
 
@@ -82,7 +82,7 @@ def initialize_1d_system(L=1.0, N=500, dt=0.001, T=0.5):
 def initialize_2d_system(L=1.0, N=500, dt=0.001, T=0.5):
     """
     Initialize the 2D harmonic oscillator system for simulation.
-    
+
     Parameters
     ----------
     L : float
@@ -93,7 +93,7 @@ def initialize_2d_system(L=1.0, N=500, dt=0.001, T=0.5):
         Time step size
     T : float
         Total simulation time
-        
+
     Returns
     -------
     X : ndarray
@@ -141,7 +141,7 @@ def initialize_2d_system(L=1.0, N=500, dt=0.001, T=0.5):
 def time_step_1d(psi, V, k, dt):
     """
     Perform a single time step in 1D using Split-Operator Method.
-    
+
     Parameters
     ----------
     psi : ndarray
@@ -152,7 +152,7 @@ def time_step_1d(psi, V, k, dt):
         Wave vector grid
     dt : float
         Time step size
-        
+
     Returns
     -------
     psi : ndarray
@@ -161,22 +161,22 @@ def time_step_1d(psi, V, k, dt):
     # Split-Operator steps:
     # 1. Half-step in position space
     psi = np.exp(-0.5j * V * dt / hbar) * psi
-    
+
     # 2. Full-step in momentum space
     psi_k = np.fft.fft(psi)
     psi_k *= np.exp(-0.5j * hbar * k**2 * dt / m)
     psi = np.fft.ifft(psi_k)
-    
+
     # 3. Another half-step in position space
     psi = np.exp(-0.5j * V * dt / hbar) * psi
-    
+
     return psi
 
 
 def time_step_2d(psi, V, Kx, Ky, dt):
     """
     Perform a single time step in 2D using Split-Operator Method.
-    
+
     Parameters
     ----------
     psi : ndarray
@@ -189,7 +189,7 @@ def time_step_2d(psi, V, Kx, Ky, dt):
         Y-component wave vector grid
     dt : float
         Time step size
-        
+
     Returns
     -------
     psi : ndarray
@@ -198,22 +198,22 @@ def time_step_2d(psi, V, Kx, Ky, dt):
     # Split-Operator steps:
     # 1. Half-step in position space
     psi = np.exp(-0.5j * V * dt / hbar) * psi
-    
+
     # 2. Full-step in momentum space
     psi_k = np.fft.fft2(psi)
     psi_k *= np.exp(-0.5j * hbar * (Kx**2 + Ky**2) * dt / m)
     psi = np.fft.ifft2(psi_k)
-    
+
     # 3. Another half-step in position space
     psi = np.exp(-0.5j * V * dt / hbar) * psi
-    
+
     return psi
 
 
 def run_1d_harmonic_simulation():
     """
     Run and animate the 1D harmonic oscillator simulation.
-    
+
     Produces:
     - Plot of probability density evolving in time
     - Overlay of the harmonic potential
@@ -257,7 +257,7 @@ def run_1d_harmonic_simulation():
 def run_2d_harmonic_simulation():
     """
     Run and animate the 2D harmonic oscillator simulation.
-    
+
     Produces:
     - 2D heatmap of probability density
     - 3D surface plot of probability density
@@ -290,7 +290,9 @@ def run_2d_harmonic_simulation():
         np.abs(psi) ** 2, extent=[-1, 1, -1, 1], origin="lower", cmap="viridis"
     )
     plt.colorbar(im, ax=ax1, label="Probability Density")
-    ax1.set_title("2D Probability Density")
+    ax1.set_title("2D Probability Density $|\psi(x, y, t)|^2$")
+    ax1.set_xlabel("X")
+    ax1.set_ylabel("Y")
 
     # 3D Surface plot
     ax2 = fig.add_subplot(122, projection="3d")
@@ -298,8 +300,11 @@ def run_2d_harmonic_simulation():
         X, Y, np.abs(psi) ** 2, cmap="hot", rstride=2, cstride=2, alpha=0.8
     )
     ax2.set_title("3D Probability Density")
+    ax2.set_xlabel("X")
+    ax2.set_ylabel("Y")
+    ax2.set_zlabel("Probability Density")
 
-    fig.suptitle("2D Quantum Harmonic Oscillator", fontsize=14)
+    fig.suptitle("2D Harmonic Potential Well Wave Packet Dynamics", fontsize=14)
     plt.tight_layout()
 
     def animate(i):
@@ -317,7 +322,9 @@ def run_2d_harmonic_simulation():
         )
         ax2.set_zlim(0, np.max(np.abs(psi) ** 2))
         ax2.set_title("3D Probability Density")
-
+        ax2.set_xlabel("X")
+        ax2.set_ylabel("Y")
+        ax2.set_zlabel("Probability Density")
         return im, surf
 
     # Create and save animation

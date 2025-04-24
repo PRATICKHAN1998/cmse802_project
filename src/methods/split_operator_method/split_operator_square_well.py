@@ -24,14 +24,14 @@ import os
 
 # Physical constants
 hbar = 1.0  # Reduced Planck's constant (natural units)
-m = 1.0     # Particle mass (natural units)
-L = 1.0     # Length of the infinite square well
+m = 1.0  # Particle mass (natural units)
+L = 1.0  # Length of the infinite square well
 
 
 def initialize_1d_system(N=500, dt=0.001, T_total=0.5):
     """
     Initialize the 1D infinite square well system for simulation.
-    
+
     Parameters
     ----------
     N : int
@@ -40,7 +40,7 @@ def initialize_1d_system(N=500, dt=0.001, T_total=0.5):
         Time step size
     T_total : float
         Total simulation time
-        
+
     Returns
     -------
     x : ndarray
@@ -80,7 +80,7 @@ def initialize_1d_system(N=500, dt=0.001, T_total=0.5):
 def initialize_2d_system(N=500, dt=0.001, T_total=0.5):
     """
     Initialize the 2D infinite square well system for simulation.
-    
+
     Parameters
     ----------
     N : int
@@ -89,7 +89,7 @@ def initialize_2d_system(N=500, dt=0.001, T_total=0.5):
         Time step size
     T_total : float
         Total simulation time
-        
+
     Returns
     -------
     X : ndarray
@@ -137,7 +137,7 @@ def initialize_2d_system(N=500, dt=0.001, T_total=0.5):
 def time_step_split_operator_1d(psi, V, kx, dt):
     """
     Perform a single time step in 1D using Split-Operator Method.
-    
+
     Parameters
     ----------
     psi : ndarray
@@ -148,7 +148,7 @@ def time_step_split_operator_1d(psi, V, kx, dt):
         Wave vector grid
     dt : float
         Time step size
-        
+
     Returns
     -------
     psi : ndarray
@@ -174,7 +174,7 @@ def time_step_split_operator_1d(psi, V, kx, dt):
 def time_step_split_operator_2d(psi, V, Kx, Ky, dt):
     """
     Perform a single time step in 2D using Split-Operator Method.
-    
+
     Parameters
     ----------
     psi : ndarray
@@ -187,7 +187,7 @@ def time_step_split_operator_2d(psi, V, Kx, Ky, dt):
         Y-component wave vector grid
     dt : float
         Time step size
-        
+
     Returns
     -------
     psi : ndarray
@@ -213,7 +213,7 @@ def time_step_split_operator_2d(psi, V, Kx, Ky, dt):
 def run_1d_square_potential_simulation():
     """
     Run and animate the 1D infinite square well simulation.
-    
+
     Produces:
     - Plot of probability density evolving in time
     - Saves animation as MP4 in results/split_operator_1D_results/
@@ -254,7 +254,7 @@ def run_1d_square_potential_simulation():
 def run_2d_square_potential_simulation():
     """
     Run and animate the 2D infinite square well simulation.
-    
+
     Produces:
     - 2D heatmap of probability density
     - 3D surface plot of probability density
@@ -277,8 +277,8 @@ def run_2d_square_potential_simulation():
     )
     plt.colorbar(im, ax=ax1, label="Probability Density")
     ax1.set_title("2D Probability Density $|\psi(x,y,t)|^2$")
-    ax1.set_xlabel("X Position")
-    ax1.set_ylabel("Y Position")
+    ax1.set_xlabel("X")
+    ax1.set_ylabel("Y")
 
     # 2. 3D Surface Plot
     ax2 = fig.add_subplot(122, projection="3d")
@@ -286,8 +286,8 @@ def run_2d_square_potential_simulation():
         X, Y, np.abs(psi) ** 2, cmap="hot", rstride=2, cstride=2, antialiased=False
     )
     ax2.set_title("3D Probability Density")
-    ax2.set_xlabel("X Position")
-    ax2.set_ylabel("Y Position")
+    ax2.set_xlabel("X")
+    ax2.set_ylabel("Y")
     ax2.set_zlabel("Probability Density")
 
     fig.suptitle("2D Infinite Square Well Wave Packet Dynamics", fontsize=14)
@@ -308,8 +308,8 @@ def run_2d_square_potential_simulation():
         )
         ax2.set_zlim(0, np.max(np.abs(psi) ** 2))
         ax2.set_title("3D Probability Density")
-        ax2.set_xlabel("X Position")
-        ax2.set_ylabel("Y Position")
+        ax2.set_xlabel("X")
+        ax2.set_ylabel("Y")
         ax2.set_zlabel("Probability Density")
 
         return im, surf

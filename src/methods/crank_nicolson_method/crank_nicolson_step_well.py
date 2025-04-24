@@ -23,14 +23,14 @@ import os
 
 # Constants
 hbar = 1.0  # Reduced Planck's constant
-m = 1.0     # Particle mass
-L = 1.0     # System length
+m = 1.0  # Particle mass
+L = 1.0  # System length
 
 
 def initialize_1d_step_potential(N=500, dt=0.001, T_total=0.5, V0=20):
     """
     Initialize the 1D system with a step potential for Crank-Nicolson simulation.
-    
+
     Parameters
     ----------
     N : int
@@ -41,7 +41,7 @@ def initialize_1d_step_potential(N=500, dt=0.001, T_total=0.5, V0=20):
         Total simulation time
     V0 : float
         Height of the potential step
-        
+
     Returns
     -------
     x : ndarray
@@ -91,7 +91,7 @@ def initialize_1d_step_potential(N=500, dt=0.001, T_total=0.5, V0=20):
 def time_step_crank_nicolson_1d_step(psi, A, B):
     """
     Perform a single Crank-Nicolson time step in 1D with step potential.
-    
+
     Parameters
     ----------
     psi : ndarray
@@ -100,7 +100,7 @@ def time_step_crank_nicolson_1d_step(psi, A, B):
         Left-hand side matrix
     B : ndarray
         Right-hand side matrix
-        
+
     Returns
     -------
     psi_new : ndarray
@@ -115,7 +115,7 @@ def time_step_crank_nicolson_1d_step(psi, A, B):
 def initialize_2d_step_potential(N=500, dt=0.001, T_total=0.5, V0=20):
     """
     Initialize the 2D system with a step potential for Crank-Nicolson simulation.
-    
+
     Parameters
     ----------
     N : int
@@ -126,13 +126,13 @@ def initialize_2d_step_potential(N=500, dt=0.001, T_total=0.5, V0=20):
         Total simulation time
     V0 : float
         Height of the potential step
-        
+
     Returns
     -------
     X : ndarray
         2D X-coordinate grid
     Y : ndarray
-        2D Y-coordinate grid  
+        2D Y-coordinate grid
     psi : ndarray
         Initial 2D wave function
     V : ndarray
@@ -181,7 +181,7 @@ def initialize_2d_step_potential(N=500, dt=0.001, T_total=0.5, V0=20):
 def time_step_crank_nicolson_2d_step(psi, V, D, D_inv, dt):
     """
     Perform a single Crank-Nicolson time step in 2D with step potential.
-    
+
     Parameters
     ----------
     psi : ndarray
@@ -194,7 +194,7 @@ def time_step_crank_nicolson_2d_step(psi, V, D, D_inv, dt):
         Inverse of Crank-Nicolson operator
     dt : float
         Time step size
-        
+
     Returns
     -------
     psi : ndarray
@@ -211,11 +211,11 @@ def time_step_crank_nicolson_2d_step(psi, V, D, D_inv, dt):
 def run_1d_step_potential_simulation():
     """
     Run and animate the 1D step potential simulation.
-    
+
     Saves animation as MP4 in results/crank_nicolson_1D_results/
     """
     x, psi, A, B, dt, steps, a, V0 = initialize_1d_step_potential()
-    
+
     fig, ax = plt.subplots()
     (line,) = ax.plot(x, np.abs(psi) ** 2, color="blue", lw=2)
     ax.axvline(
@@ -251,7 +251,7 @@ def run_1d_step_potential_simulation():
 def run_2d_step_potential_simulation():
     """
     Run and animate the 2D step potential simulation.
-    
+
     Produces:
     - 2D heatmap of probability density
     - 3D surface plot of probability density
@@ -281,14 +281,15 @@ def run_2d_step_potential_simulation():
     ax1.legend()
 
     # Right: 3D surface plot
-   
+
     ax2 = fig.add_subplot(122, projection="3d")
     surf = ax2.plot_surface(
-    X, Y, np.abs(psi) ** 2, cmap="hot", rstride=2, cstride=2, alpha=0.8 )
+        X, Y, np.abs(psi) ** 2, cmap="hot", rstride=2, cstride=2, alpha=0.8
+    )
     ax2.set_title("3D Probability Density")
-    ax2.set_xlabel("X position")
-    ax2.set_ylabel("Y position")
-    ax2.set_zlabel("|ψ|²")
+    ax2.set_xlabel("X")
+    ax2.set_ylabel("Y")
+    ax2.set_zlabel("Probablity Density")
     ax2.set_zlim(0, np.max(np.abs(psi) ** 2))
 
     fig.suptitle(f"2D Wave Packet Across Potential Step (V₀ = {V0})", fontsize=14)
@@ -309,7 +310,7 @@ def run_2d_step_potential_simulation():
         ax2.set_title("3D Probability Density")
         ax2.set_xlabel("X")
         ax2.set_ylabel("Y")
-        ax2.set_zlabel("Density")
+        ax2.set_zlabel("Probability Density")
 
         return im, surf
 

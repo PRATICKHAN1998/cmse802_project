@@ -200,6 +200,7 @@ def run_1d_simulation():
     ax.set_xlabel("Position")
     ax.set_ylabel("Probability Density")
     ax.set_title("1D Infinite Square Well Wave Packet Dynamics")
+
     def animate(i):
         nonlocal psi
         psi = time_step_crank_nicolson_1d(psi, A, B)
@@ -255,7 +256,7 @@ def run_2d_simulation():
     ax2.set_title("3D Probability Density")
     ax2.set_xlabel("X")
     ax2.set_ylabel("Y")
-    ax2.set_zlabel("Density")
+    ax2.set_zlabel("Probablity Density")
     fig.suptitle("2D Infinite Square Well Wave Packet Dynamics", fontsize=14)
     plt.tight_layout()
 
@@ -274,7 +275,7 @@ def run_2d_simulation():
         ax2.set_title("3D Probability Density")
         ax2.set_xlabel("X")
         ax2.set_ylabel("Y")
-        ax2.set_zlabel("Density")
+        ax2.set_zlabel(" Probablity Density")
 
         return im, surf
 
@@ -303,4 +304,3 @@ if __name__ == "__main__":
     run_2d_simulation()
 
     print("Simulations complete! Check the results directory.")
-

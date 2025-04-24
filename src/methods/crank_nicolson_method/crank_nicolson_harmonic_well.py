@@ -24,14 +24,14 @@ import os
 
 # Physical constants
 hbar = 1.0  # Reduced Planck's constant (natural units)
-m = 1.0     # Particle mass (natural units)
-L = 1.0     # System size (symmetric about origin)
+m = 1.0  # Particle mass (natural units)
+L = 1.0  # System size (symmetric about origin)
 
 
 def initialize_1d_harmonic_system(N=500, dt=0.001, T=0.5, omega=10.0):
     """
     Initialize the 1D harmonic oscillator system for simulation.
-    
+
     Parameters
     ----------
     N : int
@@ -42,7 +42,7 @@ def initialize_1d_harmonic_system(N=500, dt=0.001, T=0.5, omega=10.0):
         Total simulation time
     omega : float
         Angular frequency of harmonic potential
-        
+
     Returns
     -------
     x : ndarray
@@ -91,7 +91,7 @@ def initialize_1d_harmonic_system(N=500, dt=0.001, T=0.5, omega=10.0):
 def time_step_crank_nicolson_1d_harmonic(psi, A, B):
     """
     Perform a single Crank-Nicolson time step in 1D harmonic potential.
-    
+
     Parameters
     ----------
     psi : ndarray
@@ -100,7 +100,7 @@ def time_step_crank_nicolson_1d_harmonic(psi, A, B):
         Left-hand side matrix
     B : ndarray
         Right-hand side matrix
-        
+
     Returns
     -------
     psi_new : ndarray
@@ -114,7 +114,7 @@ def time_step_crank_nicolson_1d_harmonic(psi, A, B):
 def initialize_2d_harmonic_system(N=500, dt=0.001, T=0.5, omega=10.0):
     """
     Initialize the 2D harmonic oscillator system for simulation.
-    
+
     Parameters
     ----------
     N : int
@@ -125,7 +125,7 @@ def initialize_2d_harmonic_system(N=500, dt=0.001, T=0.5, omega=10.0):
         Total simulation time
     omega : float
         Angular frequency of harmonic potential
-        
+
     Returns
     -------
     X : ndarray
@@ -177,9 +177,9 @@ def initialize_2d_harmonic_system(N=500, dt=0.001, T=0.5, omega=10.0):
 def time_step_crank_nicolson_2d_harmonic(psi, V, D, D_inv, dt):
     """
     Perform a single Crank-Nicolson time step in 2D harmonic potential.
-    
+
     Uses operator splitting with potential term handled separately.
-    
+
     Parameters
     ----------
     psi : ndarray
@@ -192,7 +192,7 @@ def time_step_crank_nicolson_2d_harmonic(psi, V, D, D_inv, dt):
         Inverse of Crank-Nicolson operator
     dt : float
         Time step size
-        
+
     Returns
     -------
     psi : ndarray
@@ -200,12 +200,12 @@ def time_step_crank_nicolson_2d_harmonic(psi, V, D, D_inv, dt):
     """
     # Boundary conditions
     psi[0, :] = psi[-1, :] = psi[:, 0] = psi[:, -1] = 0
-    
+
     # Operator splitting
     psi = np.exp(-0.5j * V * dt / hbar) * psi  # Potential half-step
     psi = D_inv @ psi @ D_inv.T  # Kinetic step
     psi = np.exp(-0.5j * V * dt / hbar) * psi  # Potential half-step
-    
+
     # Reapply boundaries
     psi[0, :] = psi[-1, :] = psi[:, 0] = psi[:, -1] = 0
     return psi
@@ -214,14 +214,14 @@ def time_step_crank_nicolson_2d_harmonic(psi, V, D, D_inv, dt):
 def run_1d_harmonic_simulation():
     """
     Run and animate the 1D harmonic oscillator simulation.
-    
+
     Produces:
     - Plot of probability density evolving in time
     - Overlay of the harmonic potential
     - Saves animation as MP4 in results/crank_nicolson_1D_results/
     """
     x, psi, A, B, V, dt, steps = initialize_1d_harmonic_system()
-    
+
     fig, ax = plt.subplots()
     (line,) = ax.plot(x, np.abs(psi) ** 2, lw=2)
     (pot_line,) = ax.plot(x, V, "r--", label="Harmonic Potential")
@@ -255,7 +255,7 @@ def run_1d_harmonic_simulation():
 def run_2d_harmonic_simulation():
     """
     Run and animate the 2D harmonic oscillator simulation.
-    
+
     Produces:
     - 2D heatmap of probability density
     - 3D surface plot of probability density
@@ -288,7 +288,9 @@ def run_2d_harmonic_simulation():
     ax2.set_title("3D Probability Density")
     ax2.set_xlabel("X")
     ax2.set_ylabel("Y")
-    ax2.set_zlabel("Density")
+    ax2.set_zlabel("Probability Density")
+    fig.suptitle("2D Harmonic Potential Well Wave Packet Dynamics", fontsize=14)
+    plt.tight_layout()
 
     def animate(i):
         nonlocal psi, surf
@@ -307,7 +309,7 @@ def run_2d_harmonic_simulation():
         ax2.set_title("3D Probability Density")
         ax2.set_xlabel("X")
         ax2.set_ylabel("Y")
-        ax2.set_zlabel("Density")
+        ax2.set_zlabel("Probability Density")
 
         return im, surf
 

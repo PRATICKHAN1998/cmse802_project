@@ -24,14 +24,14 @@ import os
 
 # Physical constants
 hbar = 1.0  # Reduced Planck's constant (natural units)
-m = 1.0     # Particle mass (natural units)
-L = 4.0     # System size (symmetric about origin)
+m = 1.0  # Particle mass (natural units)
+L = 4.0  # System size (symmetric about origin)
 
 
-def initialize_1d_double_well(N=500, dt=0.001, T_total=0.5, V0=4000.0, a=0.3):
+def initialize_1d_double_well(N=500, dt=0.001, T_total=0.5, V0=10000.0, a=3.0):
     """
     Initialize the 1D double-well potential system for simulation.
-    
+
     Parameters
     ----------
     N : int
@@ -44,7 +44,7 @@ def initialize_1d_double_well(N=500, dt=0.001, T_total=0.5, V0=4000.0, a=0.3):
         Potential well depth parameter
     a : float
         Controls width and separation of wells
-        
+
     Returns
     -------
     x : ndarray
@@ -94,7 +94,7 @@ def initialize_1d_double_well(N=500, dt=0.001, T_total=0.5, V0=4000.0, a=0.3):
 def time_step_crank_nicolson_1d_double(psi, A, B):
     """
     Perform a single Crank-Nicolson time step in 1D double-well.
-    
+
     Parameters
     ----------
     psi : ndarray
@@ -103,7 +103,7 @@ def time_step_crank_nicolson_1d_double(psi, A, B):
         Left-hand side matrix
     B : ndarray
         Right-hand side matrix
-        
+
     Returns
     -------
     psi_new : ndarray
@@ -114,10 +114,10 @@ def time_step_crank_nicolson_1d_double(psi, A, B):
     return psi_new
 
 
-def initialize_2d_double_well(N=500, dt=0.001, T_total=1.0, V0=4000.0, a=0.3):
+def initialize_2d_double_well(N=500, dt=0.001, T_total=1.0, V0=10000.0, ax=3, ay=3):
     """
     Initialize the 2D double-well potential system for simulation.
-    
+
     Parameters
     ----------
     N : int
@@ -130,7 +130,7 @@ def initialize_2d_double_well(N=500, dt=0.001, T_total=1.0, V0=4000.0, a=0.3):
         Potential well depth parameter
     a : float
         Controls width and separation of wells
-        
+
     Returns
     -------
     X : ndarray
@@ -156,7 +156,7 @@ def initialize_2d_double_well(N=500, dt=0.001, T_total=1.0, V0=4000.0, a=0.3):
     steps = int(T_total / dt)
 
     # 2D double-well potential
-    V = V0 * ((X**4 + Y**4) / a**4 - (X**2 + Y**2) / a**2)
+    V = V0 * (X**4 / ax**4 - X**2 / ax**2 + Y**4 / ay**4 - Y**2 / ay**2)
 
     # Initial 2D Gaussian wave packet
     x0, y0 = -1.0, 0.0  # Initial position (left well)
@@ -182,9 +182,9 @@ def initialize_2d_double_well(N=500, dt=0.001, T_total=1.0, V0=4000.0, a=0.3):
 def time_step_crank_nicolson_2d_double(psi, V, D, D_inv, dt):
     """
     Perform a single Crank-Nicolson time step in 2D double-well.
-    
+
     Uses operator splitting with potential term handled separately.
-    
+
     Parameters
     ----------
     psi : ndarray
@@ -197,7 +197,7 @@ def time_step_crank_nicolson_2d_double(psi, V, D, D_inv, dt):
         Inverse of Crank-Nicolson operator
     dt : float
         Time step size
-        
+
     Returns
     -------
     psi : ndarray
@@ -205,12 +205,12 @@ def time_step_crank_nicolson_2d_double(psi, V, D, D_inv, dt):
     """
     # Boundary conditions
     psi[0, :] = psi[-1, :] = psi[:, 0] = psi[:, -1] = 0
-    
+
     # Operator splitting
     psi = np.exp(-0.5j * V * dt / hbar) * psi  # Potential half-step
     psi = D_inv @ psi @ D_inv.T  # Kinetic step
     psi = np.exp(-0.5j * V * dt / hbar) * psi  # Potential half-step
-    
+
     # Reapply boundaries
     psi[0, :] = psi[-1, :] = psi[:, 0] = psi[:, -1] = 0
     return psi
@@ -219,14 +219,14 @@ def time_step_crank_nicolson_2d_double(psi, V, D, D_inv, dt):
 def run_1d_double_well_simulation():
     """
     Run and animate the 1D double-well potential simulation.
-    
+
     Produces:
     - Plot of probability density evolving in time
     - Overlay of the double-well potential
     - Saves animation as MP4 in results/crank_nicolson_1D_results/
     """
     x, psi, A, B, V_norm, dt, steps = initialize_1d_double_well()
-    
+
     fig, ax = plt.subplots()
     (line,) = ax.plot(x, np.abs(psi) ** 2, lw=2)
     ax.plot(x, V_norm, "k--", label="Double Well Potential $V(x)$ (scaled)")
@@ -260,7 +260,7 @@ def run_1d_double_well_simulation():
 def run_2d_double_well_simulation():
     """
     Run and animate the 2D double-well potential simulation.
-    
+
     Produces:
     - 2D heatmap of probability density
     - 3D surface plot of probability density
